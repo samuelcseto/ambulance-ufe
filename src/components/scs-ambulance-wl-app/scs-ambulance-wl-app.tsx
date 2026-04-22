@@ -56,7 +56,12 @@ export class ScsAmbulanceWlApp {
     return (
       <Host>
         {element === 'editor' ? (
-          <scs-ambulance-wl-editor entry-id={entryId} oneditor-closed={() => navigate('./list')}></scs-ambulance-wl-editor>
+          <scs-ambulance-wl-editor
+            entry-id={entryId}
+            ambulance-id={this.ambulanceId}
+            api-base={this.apiBase}
+            oneditor-closed={() => navigate('./list')}
+          ></scs-ambulance-wl-editor>
         ) : (
           <scs-ambulance-wl-list
             ambulance-id={this.ambulanceId}
