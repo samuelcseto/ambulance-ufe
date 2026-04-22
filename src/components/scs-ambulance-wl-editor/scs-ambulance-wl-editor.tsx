@@ -34,6 +34,7 @@ export class ScsAmbulanceWlEditor {
         waitingSince: new Date().toISOString(),
         estimatedDurationMinutes: 15,
       };
+      this.entry.estimatedStart = (await this.assumedEntryDateAsync()).toISOString();
       return this.entry;
     }
     if (!this.entryId) {
@@ -52,6 +53,21 @@ export class ScsAmbulanceWlEditor {
       this.errorMessage = `Cannot retrieve list of waiting patients: ${err.message || 'unknown'}`;
     }
     return undefined;
+  }
+
+  private async assumedEntryDateAsync(): Promise<Date> {
+    try {
+      const response = await AmbulanceWaitingListApiFactory(undefined, this.apiBase).getWaitingListEntries(this.ambulanceId);
+      if (response.status > 299) {
+        return new Date();
+      }
+      const lastPatientOut = response.data
+        .map((e: WaitingListEntry) => Date.parse(e.estimatedStart) + e.estimatedDurationMinutes * 60 * 1000)
+        .reduce((acc: number, value: number) => Math.max(acc, value), 0);
+      return new Date(Math.max(Date.now(), lastPatientOut));
+    } catch (err: any) {
+      return new Date();
+    }
   }
 
   private async getConditions(): Promise<Condition[]> {
@@ -116,8 +132,12 @@ export class ScsAmbulanceWlEditor {
             <md-icon slot="leading-icon">fingerprint</md-icon>
           </md-filled-text-field>
 
-          <md-filled-text-field label="Čakáte od" disabled value={this.entry?.waitingSince}>
+          <md-filled-text-field label="Čakáte od" disabled value={new Date(this.entry?.waitingSince || Date.now()).toLocaleTimeString()}>
             <md-icon slot="leading-icon">watch_later</md-icon>
+          </md-filled-text-field>
+
+          <md-filled-text-field label="Predpokladaný čas vyšetrenia" disabled value={new Date(this.entry?.estimatedStart || Date.now()).toLocaleTimeString()}>
+            <md-icon slot="leading-icon">login</md-icon>
           </md-filled-text-field>
 
           {this.renderConditions()}
