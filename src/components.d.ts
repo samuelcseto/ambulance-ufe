@@ -7,6 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface ScsAmbulanceWlApp {
+        "ambulanceId": string;
+        "apiBase": string;
         /**
           * @default ''
          */
@@ -16,6 +18,8 @@ export namespace Components {
         "entryId": string;
     }
     interface ScsAmbulanceWlList {
+        "ambulanceId": string;
+        "apiBase": string;
     }
 }
 export interface ScsAmbulanceWlEditorCustomEvent<T> extends CustomEvent<T> {
@@ -75,6 +79,8 @@ declare global {
 }
 declare namespace LocalJSX {
     interface ScsAmbulanceWlApp {
+        "ambulanceId"?: string;
+        "apiBase"?: string;
         /**
           * @default ''
          */
@@ -85,20 +91,28 @@ declare namespace LocalJSX {
         "onEditor-closed"?: (event: ScsAmbulanceWlEditorCustomEvent<string>) => void;
     }
     interface ScsAmbulanceWlList {
+        "ambulanceId"?: string;
+        "apiBase"?: string;
         "onEntry-clicked"?: (event: ScsAmbulanceWlListCustomEvent<string>) => void;
     }
 
     interface ScsAmbulanceWlAppAttributes {
         "basePath": string;
+        "apiBase": string;
+        "ambulanceId": string;
     }
     interface ScsAmbulanceWlEditorAttributes {
         "entryId": string;
+    }
+    interface ScsAmbulanceWlListAttributes {
+        "apiBase": string;
+        "ambulanceId": string;
     }
 
     interface IntrinsicElements {
         "scs-ambulance-wl-app": Omit<ScsAmbulanceWlApp, keyof ScsAmbulanceWlAppAttributes> & { [K in keyof ScsAmbulanceWlApp & keyof ScsAmbulanceWlAppAttributes]?: ScsAmbulanceWlApp[K] } & { [K in keyof ScsAmbulanceWlApp & keyof ScsAmbulanceWlAppAttributes as `attr:${K}`]?: ScsAmbulanceWlAppAttributes[K] } & { [K in keyof ScsAmbulanceWlApp & keyof ScsAmbulanceWlAppAttributes as `prop:${K}`]?: ScsAmbulanceWlApp[K] };
         "scs-ambulance-wl-editor": Omit<ScsAmbulanceWlEditor, keyof ScsAmbulanceWlEditorAttributes> & { [K in keyof ScsAmbulanceWlEditor & keyof ScsAmbulanceWlEditorAttributes]?: ScsAmbulanceWlEditor[K] } & { [K in keyof ScsAmbulanceWlEditor & keyof ScsAmbulanceWlEditorAttributes as `attr:${K}`]?: ScsAmbulanceWlEditorAttributes[K] } & { [K in keyof ScsAmbulanceWlEditor & keyof ScsAmbulanceWlEditorAttributes as `prop:${K}`]?: ScsAmbulanceWlEditor[K] };
-        "scs-ambulance-wl-list": ScsAmbulanceWlList;
+        "scs-ambulance-wl-list": Omit<ScsAmbulanceWlList, keyof ScsAmbulanceWlListAttributes> & { [K in keyof ScsAmbulanceWlList & keyof ScsAmbulanceWlListAttributes]?: ScsAmbulanceWlList[K] } & { [K in keyof ScsAmbulanceWlList & keyof ScsAmbulanceWlListAttributes as `attr:${K}`]?: ScsAmbulanceWlListAttributes[K] } & { [K in keyof ScsAmbulanceWlList & keyof ScsAmbulanceWlListAttributes as `prop:${K}`]?: ScsAmbulanceWlList[K] };
     }
 }
 export { LocalJSX as JSX };

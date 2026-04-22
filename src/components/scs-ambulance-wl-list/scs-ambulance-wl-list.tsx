@@ -1,4 +1,6 @@
-import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
+import { AmbulanceWaitingListApiFactory, WaitingListEntry } from '../../api/ambulance-wl';
+
 @Component({
   tag: 'scs-ambulance-wl-list',
   styleUrl: 'scs-ambulance-wl-list.css',
@@ -6,49 +8,46 @@ import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
 })
 export class ScsAmbulanceWlList {
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
+  @Prop() apiBase: string;
+  @Prop() ambulanceId: string;
+  @State() errorMessage: string;
 
-  waitingPatients: any[];
+  waitingPatients: WaitingListEntry[];
 
-  private async getWaitingPatientsAsync() {
-    return await Promise.resolve([
-      {
-        name: 'Jožko PúčikSSSSSSS',
-        patientId: '10001',
-        estimatedStart: new Date(Date.now() + 65 * 60),
-        estimatedDurationMinutes: 15,
-        condition: 'Kontrola',
-      },
-      {
-        name: 'Bc. August Cézar',
-        patientId: '10096',
-        estimatedStart: new Date(Date.now() + 30 * 60),
-        estimatedDurationMinutes: 20,
-        condition: 'Teploty',
-      },
-      {
-        name: 'Ing. Ferdinand Trety',
-        patientId: '10028',
-        estimatedStart: new Date(Date.now() + 5 * 60),
-        estimatedDurationMinutes: 15,
-        condition: 'Bolesti hrdla',
-      },
-    ]);
+  private async getWaitingPatientsAsync(): Promise<WaitingListEntry[]> {
+    try {
+      const response = await AmbulanceWaitingListApiFactory(undefined, this.apiBase).getWaitingListEntries(this.ambulanceId);
+      if (response.status < 299) {
+        return response.data;
+      } else {
+        this.errorMessage = `Cannot retrieve list of waiting patients: ${response.statusText}`;
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve list of waiting patients: ${err.message || 'unknown'}`;
+    }
+    return [];
   }
+
   async componentWillLoad() {
     this.waitingPatients = await this.getWaitingPatientsAsync();
   }
+
   render() {
     return (
       <Host>
-        <md-list>
-          {this.waitingPatients.map((patient, index) => (
-            <md-list-item onClick={() => this.entryClicked.emit(index.toString())}>
-              <div slot="headline">{patient.name}</div>
-              <div slot="supporting-text">{'Predpokladaný vstup: ' + patient.estimatedStart?.toLocaleString()}</div>
-              <md-icon slot="start">person</md-icon>
-            </md-list-item>
-          ))}
-        </md-list>
+        {this.errorMessage ? (
+          <div class="error">{this.errorMessage}</div>
+        ) : (
+          <md-list>
+            {this.waitingPatients.map((patient, index) => (
+              <md-list-item onClick={() => this.entryClicked.emit(index.toString())}>
+                <div slot="headline">{patient.name}</div>
+                <div slot="supporting-text">{'Predpokladaný vstup: ' + new Date(patient.estimatedStart).toLocaleTimeString()}</div>
+                <md-icon slot="start">person</md-icon>
+              </md-list-item>
+            ))}
+          </md-list>
+        )}
       </Host>
     );
   }
